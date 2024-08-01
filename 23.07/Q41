@@ -1,0 +1,24 @@
+//가위는 1, 바위는 2, 보는 3
+//비기는 경우는 없다.
+//A와 B가 무엇을 냈는지 빈 칸을 사이로 주어진다.
+
+import java.util.Scanner;
+import java.io.FileInputStream;
+
+class Solution
+{
+	public static void main(String args[]) throws Exception
+	{
+		Scanner sc = new Scanner(System.in);
+        int a = sc.nextInt();
+        int b = sc.nextInt();
+        
+        if ((a==1 && b==3) || (a==2 && b==1) || (a==3 && b==2)) {
+            System.out.printf("A");
+        } else {
+            System.out.printf("B");
+        }
+    }
+}
+
+//성공
