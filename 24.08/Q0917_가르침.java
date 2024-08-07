@@ -1,6 +1,79 @@
-// 테케 통과. 시간초과
+// 성공
 // https://www.acmicpc.net/problem/1062
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
+
+public class 가르침 {
+	static int n;
+	static int k;
+	static int result;
+	static String[] str;
+	static boolean[] visited = new boolean[26];
+	
+	public static void count() {
+		int cnt = 0;
+		for(int s = 0; s < n; s++) {
+			boolean flag = true;
+			for(int i = 0; i < str[s].length(); i++) {
+				if(!visited[str[s].charAt(i) - 'a']) {
+					flag = false;
+					break;
+				}
+			}
+			if(flag) {
+				cnt++;
+			}
+		}
+		result = Math.max(cnt, result);
+	}
+	
+	public static void dfs(int depth, int start) {
+		if(depth == k - 5) {
+			count();
+			return;
+		}
+		for(int i = start; i < 26; i++) {
+			if(!visited[i]) {
+				visited[i] = true;
+				dfs(depth + 1, i);
+				visited[i] = false;
+			}
+		}
+	}
+	
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		n = Integer.parseInt(st.nextToken());
+		k = Integer.parseInt(st.nextToken());
+		str = new String[n];
+		for(int s = 0; s < n; s++) {
+			String temp = br.readLine();
+			str[s] = temp.substring(4, temp.length() - 4);
+		}
+		
+		if(k == 26) {
+			result = n;
+		} else if(k < 5) {
+			result = 0;
+		} else {
+			result = 0;
+			visited['a'-'a'] = true;
+			visited['n'-'a'] = true;
+			visited['t'-'a'] = true;
+			visited['i'-'a'] = true;
+			visited['c'-'a'] = true;
+			
+			dfs(0, 0);
+		}
+		System.out.println(result);
+	}
+}
+
+// 시간초과
 package 약점_체크;
 
 import java.io.BufferedReader;
