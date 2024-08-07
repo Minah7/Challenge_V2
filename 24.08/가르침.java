@@ -6,45 +6,52 @@ package 약점_체크;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 public class 가르침 {
 	static int n;
 	static int k;
 	static int result = 0;
-	static boolean[] visited = new boolean[26];
-	static boolean[] alpha = new boolean[26];
-	static ArrayList<Integer>[] arr;
-
-	public static void dfs(int depth, int cnt) {
-		if(depth == cnt) {
-			int sum = 0;
-			for(int i = 0; i < n; i++) {
-				boolean check = true;
-				if(!arr[i].isEmpty()) {
-					for(int j = 0; j < arr[i].size(); j++) {
-						if(!visited[arr[i].get(j)]) {
-							check = false;
-							break;
-						}
-					}
-				}
-				if(check) {
-					sum++;
+	static boolean[] visited = new boolean[26]; //배운 알파벳들을 넣는 곳
+	static HashMap<Integer, Set<Integer>> map = new HashMap<>();
+	
+	
+	public static void count() {
+		HashSet<Integer> set = new HashSet<>();
+		for(Map.Entry<Integer, Set<Integer>> i:
+			map.entrySet()) {
+			if(!visited[i.getKey()]) {
+				Iterator<Integer> it = map.get(i.getKey()).iterator();
+				while(it.hasNext()) {
+					set.add(it.next());
 				}
 			}
-			if(sum > result) {
-				result = sum;
-			}
-			return;
 		}
 		
-		for(int i = 0; i < 26; i++) {
-			if(alpha[i] && !visited[i]) {
-				visited[i] = true;
+		int sum = n - set.size();
+		if(sum > result) {
+			result = sum;
+		}
+	}
+	
+	public static void dfs(int depth, int cnt) {
+		if(depth == cnt) {
+			count();
+			return;
+		}
+		for(Map.Entry<Integer, Set<Integer>> set :
+			map.entrySet()) {
+			int k = set.getKey();
+			if(!visited[k]) {
+				visited[k] = true;
 				dfs(depth + 1, cnt);
-				visited[i] = false;
+				visited[k] = false;
 			}
 		}
 	}
@@ -52,43 +59,46 @@ public class 가르침 {
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine());
-		n = Integer.parseInt(st.nextToken());
-		k = Integer.parseInt(st.nextToken());
+		n = Integer.parseInt(st.nextToken()); // 단어 개수
+		k = Integer.parseInt(st.nextToken()); // 가르칠 수 있는 글자 개수
 		
+		// 모든 단어는 "anta"와 "tica"로 끝나기 때문에 k의 값은 5이상이여야 함.
 		if(k >= 5) {
+			// 기본 알파벳 ASCII 코드 사용해 불린에 넣어주기.
 			visited['a'-'a'] = true;
 			visited['n'-'a'] = true;
 			visited['t'-'a'] = true;
 			visited['i'-'a'] = true;
 			visited['c'-'a'] = true;
 			
-			arr = new ArrayList[n];
-			for(int i = 0; i < n; i++) {
-				arr[i] = new ArrayList<>();
-			}
-			
-			
+			// 단어의 알파벳을 ASCII 코드로 변환해 넣어주기.
 			for(int s = 0; s < n; s++) {
 				String str = br.readLine();
-				for(int i = 4; i < str.length() - 4; i++) {
-					Integer temp = str.charAt(i) - 'a';
-					if(!visited[temp] && !arr[s].contains(temp)) {
-						arr[s].add(temp);
-						alpha[temp] = true;
+				int len = str.length();
+				// 길이 8 이하는 체크할 필요 x
+				if(len > 8) {
+					Set<Character> set = new HashSet<>();
+					for(int i = 4; i < len - 4; i++) {
+						set.add(str.charAt(i));
+					}					
+					if(!set.isEmpty()) {
+						Iterator<Character> i = set.iterator();
+						while(i.hasNext()) {
+							int a = i.next() - 'a';
+							if(!visited[a]) {
+								if(!map.containsKey(a)) {
+									map.put(a, new HashSet<>());
+								}
+								map.get(a).add(s);
+							}
+						}					
 					}
 				}
-				if(arr[s].isEmpty()) {
-					result++;
-				}
 			}
 			
-			int cnt = 0;
-			for(int i = 0; i < 26; i++) {
-				if(alpha[i]) {
-					cnt++;
-				}
-			}
+			int cnt = map.size();
 			
+			// 배우지 않은 단어의 개수가 배울 수 있는 단어의 개수보다 적으면 모든 단어를 익힐 수 있음.
 			if(cnt <= k - 5) {
 				result = n;
 			} else {
@@ -98,5 +108,4 @@ public class 가르침 {
 		
 		System.out.println(result);
 	}
-	
 }
